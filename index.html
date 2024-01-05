@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loan and Fixed Deposit Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+            background: url('absolutvision-uCMKx2H1Y38-unsplash.jpg') center/cover fixed no-repeat;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7));
+            z-index: -1;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .tabs button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+
+        .tabs button:hover {
+            background-color: #45a049;
+        }
+
+        .calculator-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .content {
+            display: none;
+        }
+
+        .loan-calculator,
+        .fixed-deposit-calculator {
+            font-family: "Roboto", sans-serif;
+            width: 600px;
+            margin: 24px auto;
+            background: #fff;
+            box-shadow: 0 12px 50px -11px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            color: #14213d;
+            overflow: hidden;
+        }
+
+        .loan-calculator,
+        .fixed-deposit-calculator * {
+            box-sizing: border-box;
+        }
+
+        .loan-calculator .top,
+        .fixed-deposit-calculator .top {
+            background: #14213d;
+            color: #fff;
+            padding: 32px;
+        }
+
+        .loan-calculator .top h2,
+        .fixed-deposit-calculator .top h2 {
+            margin-top: 0;
+        }
+
+        .loan-calculator form,
+        .fixed-deposit-calculator form {
+            display: flex;
+            gap: 8px;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .loan-calculator .title,
+        .fixed-deposit-calculator .title {
+            margin-bottom: 16px;
+        }
+        
+
+        .loan-calculator form input,
+       .fixed-deposit-calculator form input {
+    font-size: 20px;
+    padding: 8px 24px;
+    width: calc(100% - 16px); 
+    margin-bottom: 10px; 
+}
+.loan-calculator form input {
+    font-size: 20px;
+    padding: 8px 24px;
+    width: 100%;
+    margin-bottom: 15px; 
+    box-sizing: border-box;
+}
+
+        .loan-calculator .result,
+        .fixed-deposit-calculator .result {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .loan-calculator .result .left,
+        .fixed-deposit-calculator .result .left {
+            width: 100%;
+            padding: 8px 32px;
+        }
+
+        .loan-calculator .left h3,
+        .fixed-deposit-calculator .left h3 {
+            font-size: 16px;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .loan-calculator .result .value,
+        .fixed-deposit-calculator .result .value {
+            font-size: 30px;
+            font-weight: 900;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(20, 33, 61, 0.2);
+        }
+
+        .loan-calculator .result .value::before,
+        .fixed-deposit-calculator .result .value::before {
+            content: "RS";
+            font-size: 24px;
+            font-weight: 400;
+            margin-right: 6px;
+            opacity: 0.4;
+        }
+
+        .loan-calculator .calculate-btn,
+        .fixed-deposit-calculator .calculate-btn {
+            background: #e63946;
+            color: #fff;
+            border: none;
+            padding: 8px 32px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 900;
+            cursor: pointer;
+            margin: 24px 0;
+        }
+
+        .loan-calculator .right,
+        .fixed-deposit-calculator .right {
+            width: 50%;
+        }
+
+        @media (max-width: 650px) {
+            .loan-calculator,
+            .fixed-deposit-calculator {
+                width: 90%;
+                max-width: 500px;
+            }
+
+            .loan-calculator form,
+            .fixed-deposit-calculator form {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .loan-calculator .result,
+            .fixed-deposit-calculator .result {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+
+    <div class="tabs">
+        <button onclick="showCalculator('loan')">Loan Calculator</button>
+        <button onclick="showCalculator('fixedDeposit')">Fixed Deposit Calculator</button>
+    </div>
+
+    <div class="calculator-container">
+        <div class="content" id="loanCalculator">
+            <div class="loan-calculator">
+                <div class="top">
+                    <h2>Loan Calculator</h2>
+                    <form>
+                        <div class="group">
+                            <div class="title">Amount</div>
+                            <input type="text" value="30000" class="loan-amount" />
+                        </div>
+                        <div class="group">
+                            <div class="title">Interest Rate</div>
+                            <input type="text" value="8.5" class="interest-rate" />
+                        </div>
+                        <div class="group">
+                            <div class="title">Tenure (in months)</div>
+                            <input type="text" value="240" class="loan-tenure" />
+                        </div>
+                    </form>
+                </div>
+                <div class="result">
+                    <div class="left">
+                        <div class="loan-emi">
+                            <h3>Loan EMI</h3>
+                            <div class="value">123</div>
+                        </div>
+                        <div class="total-interest">
+                            <h3>Total Interest Payable</h3>
+                            <div class="value">1234</div>
+                        </div>
+                        <div class="total-amount">
+                            <h3>Total Amount</h3>
+                            <div class="value">12345</div>
+                        </div>
+                        <button class="calculate-btn">Calculate</button>
+                    </div>
+                    <div class="right">
+                        <canvas id="loanChart" width="400" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content" id="fixedDepositCalculator" style="display: none;">
+            <div class="fixed-deposit-calculator">
+                <div class="top">
+                    <h2>Fixed Deposit Calculator</h2>
+                    <form>
+                        <div class="group">
+                            <div class="title">Principal Amount</div>
+                            <input type="text" value="50000" class="fd-principal" />
+                        </div>
+                        <div class="group">
+                            <div class="title">Interest Rate</div>
+                            <input type="text" value="7" class="fd-interest-rate" />
+                        </div>
+                        <div class="group">
+                            <div class="title">Tenure (in months)</div>
+                            <input type="text" value="12" class="fd-tenure" />
+                        </div>
+                    </form>
+                </div>
+                <div class="result">
+                    <div class="left">
+                        <div class="maturity-amount">
+                            <h3>Maturity Amount</h3>
+                            <div class="value">45678</div>
+                        </div>
+                        <div class="interest-earned">
+                            <h3>Interest Earned</h3>
+                            <div class="value">5678</div>
+                        </div>
+                        <button class="calculate-btn">Calculate</button>
+                    </div>
+                    <div class="right">
+                        <canvas id="fdChart" width="400" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+const loanAmountInput = document.querySelector(".loan-amount");
+const interestRateInput = document.querySelector(".interest-rate");
+const loanTenureInput = document.querySelector(".loan-tenure");
+
+const loanEMIValue = document.querySelector(".loan-emi .value");
+const totalInterestValue = document.querySelector(".total-interest .value");
+const totalAmountValue = document.querySelector(".total-amount .value");
+
+const calculateBtn = document.querySelector(".calculate-btn");
+
+let loanAmount = parseFloat(loanAmountInput.value);
+let interestRate = parseFloat(interestRateInput.value);
+let loanTenure = parseFloat(loanTenureInput.value);
+
+let interest = interestRate / 12 / 100;
+
+let loanChart;
+
+const checkLoanValues = () => {
+  let loanAmountValue = loanAmountInput.value;
+  let interestRateValue = interestRateInput.value;
+  let loanTenureValue = loanTenureInput.value;
+
+  let regexNumber = /^[0-9]+$/;
+  if (!loanAmountValue.match(regexNumber)) {
+    loanAmountInput.value = "10000";
+  }
+
+  if (!loanTenureValue.match(regexNumber)) {
+    loanTenureInput.value = "12";
+  }
+
+  let regexDecimalNumber = /^(\d*\.)?\d+$/;
+  if (!interestRateValue.match(regexDecimalNumber)) {
+    interestRateInput.value = "7.5";
+  }
+};
+
+const displayLoanChart = (totalInterestPayableValue) => {
+  const ctx = document.getElementById("loanChart").getContext("2d");
+  loanChart = new Chart(ctx, {
+    type: "pie",
+    data: {
+      labels: ["Total Interest", "Principal Loan Amount"],
+      datasets: [
+        {
+          data: [totalInterestPayableValue, loanAmount],
+          backgroundColor: ["#e63946", "#14213d"],
+          borderWidth: 0,
+        },
+      ],
+    },
+  });
+};
+
+const updateLoanChart = (totalInterestPayableValue) => {
+  loanChart.data.datasets[0].data[0] = totalInterestPayableValue;
+  loanChart.data.datasets[0].data[1] = loanAmount;
+  loanChart.update();
+};
+
+const refreshLoanInputValues = () => {
+  loanAmount = parseFloat(loanAmountInput.value);
+  interestRate = parseFloat(interestRateInput.value);
+  loanTenure = parseFloat(loanTenureInput.value);
+  interest = interestRate / 12 / 100;
+};
+
+const calculateLoanEMI = () => {
+  checkLoanValues();
+  refreshLoanInputValues();
+  let emi =
+    loanAmount *
+    interest *
+    (Math.pow(1 + interest, loanTenure) /
+      (Math.pow(1 + interest, loanTenure) - 1));
+
+  return emi;
+};
+
+const updateLoanData = (emi) => {
+  loanEMIValue.innerHTML = Math.round(emi);
+
+  let totalAmount = Math.round(loanTenure * emi);
+  totalAmountValue.innerHTML = totalAmount;
+
+  let totalInterestPayable = Math.round(totalAmount - loanAmount);
+  totalInterestValue.innerHTML = totalInterestPayable;
+
+  if (loanChart) {
+    updateLoanChart(totalInterestPayable);
+  } else {
+    displayLoanChart(totalInterestPayable);
+  }
+};
+
+const initLoanCalculator = () => {
+  let emi = calculateLoanEMI();
+  updateLoanData(emi);
+};
+
+initLoanCalculator();
+
+calculateBtn.addEventListener("click", initLoanCalculator);
+
+
+const fdPrincipalInput = document.querySelector(".fd-principal");
+  const fdInterestRateInput = document.querySelector(".fd-interest-rate");
+  const fdTenureInput = document.querySelector(".fd-tenure");
+
+  const maturityAmountValue = document.querySelector(".maturity-amount .value");
+  const interestEarnedValue = document.querySelector(".interest-earned .value");
+
+  const calculateFDBtn = document.querySelector(".fixed-deposit-calculator .calculate-btn");
+
+  let fdPrincipal = parseFloat(fdPrincipalInput.value);
+  let fdInterestRate = parseFloat(fdInterestRateInput.value);
+  let fdTenure = parseFloat(fdTenureInput.value);
+
+  let fdInterest = fdInterestRate / 12 / 100;
+
+  let fdChart;
+
+const checkFDValues = () => {
+  let fdPrincipalValue = fdPrincipalInput.value;
+  let fdInterestRateValue = fdInterestRateInput.value;
+  let fdTenureValue = fdTenureInput.value;
+
+  let regexNumber = /^[0-9]+$/;
+  if (!fdPrincipalValue.match(regexNumber)) {
+    fdPrincipalInput.value = "10000";
+  }
+
+  if (!fdTenureValue.match(regexNumber)) {
+    fdTenureInput.value = "12";
+  }
+
+  let regexDecimalNumber = /^(\d*\.)?\d+$/;
+  if (!fdInterestRateValue.match(regexDecimalNumber)) {
+    fdInterestRateInput.value = "7.5";
+  }
+};
+
+const displayFDChart = (interestEarnedValue) => {
+  const ctx = document.getElementById("fdChart").getContext("2d");
+  fdChart = new Chart(ctx, {
+    type: "pie",
+    data: {
+      labels: ["Interest Earned", "Principal Amount"],
+      datasets: [
+        {
+          data: [interestEarnedValue, fdPrincipal],
+          backgroundColor: ["#e63946", "#14213d"],
+          borderWidth: 0,
+        },
+      ],
+    },
+  });
+};
+
+const updateFDChart = (interestEarnedValue) => {
+  fdChart.data.datasets[0].data[0] = interestEarnedValue;
+  fdChart.data.datasets[0].data[1] = fdPrincipal;
+  fdChart.update();
+};
+
+const refreshFDInputValues = () => {
+  fdPrincipal = parseFloat(fdPrincipalInput.value);
+  fdInterestRate = parseFloat(fdInterestRateInput.value);
+  fdTenure = parseFloat(fdTenureInput.value);
+  fdInterest = fdInterestRate / 12 / 100;
+};
+
+const calculateFDMaturity = () => {
+    checkFDValues();
+    refreshFDInputValues();
+
+    let maturityAmount = fdPrincipal + (fdPrincipal * fdInterest * fdTenure);
+    let interestEarned = maturityAmount - fdPrincipal;
+
+    return { maturityAmount, interestEarned };
+  };
+
+const updateFDData = ({ maturityAmount, interestEarned }) => {
+    maturityAmountValue.innerHTML = Math.round(maturityAmount);
+    interestEarnedValue.innerHTML = Math.round(interestEarned);
+
+    if (fdChart) {
+      updateFDChart(interestEarned);
+    } else {
+      displayFDChart(interestEarned);
+    }
+  };
+
+    calculateFDBtn.addEventListener("click", () => {
+    let fdData = calculateFDMaturity();
+    updateFDData(fdData);
+  });
+
+const initFDCalculator = () => {
+  console.log("Inside initFDCalculator");
+  let fdData = calculateFDMaturity();
+  updateFDData(fdData);
+};
+
+initFDCalculator();
+
+fdCalculateBtn.addEventListener("click", initFDCalculator);
+
+function showCalculator(calculatorType) {
+  if (calculatorType === 'loan') {
+    document.getElementById('loanCalculator').style.display = 'block';
+    document.getElementById('fixedDepositCalculator').style.display = 'none';
+  } else if (calculatorType === 'fixedDeposit') {
+    document.getElementById('loanCalculator').style.display = 'none';
+    document.getElementById('fixedDepositCalculator').style.display = 'block';
+  }
+}
+    </script>
+</body>
+</html>
